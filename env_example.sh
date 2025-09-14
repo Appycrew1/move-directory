@@ -1,0 +1,159 @@
+# =============================================================================
+# MOVING SUPPLIERS HUB - ENVIRONMENT VARIABLES
+# =============================================================================
+# Copy this file to .env.local and fill in your actual values
+# Never commit .env.local to version control
+
+# -----------------------------------------------------------------------------
+# SUPABASE CONFIGURATION
+# -----------------------------------------------------------------------------
+# Get these from your Supabase project settings
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+
+# -----------------------------------------------------------------------------
+# SITE CONFIGURATION
+# -----------------------------------------------------------------------------
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_NAME="Moving Suppliers Hub"
+
+# -----------------------------------------------------------------------------
+# OPENAI CONFIGURATION (for AI comparison feature)
+# -----------------------------------------------------------------------------
+OPENAI_API_KEY=sk-your-openai-api-key
+AI_API_URL=https://api.openai.com/v1
+AI_MODEL=gpt-4o-mini
+
+# -----------------------------------------------------------------------------
+# AUTHENTICATION
+# -----------------------------------------------------------------------------
+# Email address that gets admin role on first signup
+NEXT_PUBLIC_BOOTSTRAP_ADMIN_EMAIL=admin@yourdomain.com
+
+# -----------------------------------------------------------------------------
+# EMAIL CONFIGURATION
+# -----------------------------------------------------------------------------
+# Contact form and notification emails
+CONTACT_EMAIL=hello@yourdomain.com
+ADMIN_EMAIL=admin@yourdomain.com
+
+# Optional: Email service credentials (implement your preferred service)
+# SENDGRID_API_KEY=your-sendgrid-api-key
+# RESEND_API_KEY=your-resend-api-key
+# SMTP_HOST=smtp.your-provider.com
+# SMTP_PORT=587
+# SMTP_USER=your-smtp-username
+# SMTP_PASS=your-smtp-password
+
+# -----------------------------------------------------------------------------
+# ANALYTICS & MONITORING
+# -----------------------------------------------------------------------------
+# Optional: Google Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+
+# Optional: Google Search Console verification
+GOOGLE_VERIFICATION_ID=your-google-verification-id
+
+# Optional: Error tracking
+# SENTRY_DSN=your-sentry-dsn
+# NEXT_PUBLIC_SENTRY_DSN=your-public-sentry-dsn
+
+# -----------------------------------------------------------------------------
+# PAYMENT PROCESSING (Phase 3 - Premium features)
+# -----------------------------------------------------------------------------
+# Stripe for commission payments and premium subscriptions
+# STRIPE_PUBLIC_KEY=pk_test_your-stripe-public-key
+# STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+# STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
+
+# -----------------------------------------------------------------------------
+# FILE STORAGE
+# -----------------------------------------------------------------------------
+# For supplier logos and other uploads (using Supabase storage by default)
+# AWS_ACCESS_KEY_ID=your-aws-access-key
+# AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+# AWS_BUCKET_NAME=your-s3-bucket-name
+# AWS_REGION=us-east-1
+
+# -----------------------------------------------------------------------------
+# DEVELOPMENT & DEBUGGING
+# -----------------------------------------------------------------------------
+# Set to 'development' for local development
+NODE_ENV=development
+
+# Enable debug logging
+# DEBUG=true
+
+# Database direct connection (for migrations/seeds)
+# DATABASE_URL=postgresql://postgres:password@localhost:5432/moving_suppliers
+
+# -----------------------------------------------------------------------------
+# FEATURE FLAGS (Alternative to database-driven flags)
+# -----------------------------------------------------------------------------
+# You can override database flags with environment variables
+# ENABLE_COMMISSION_TRACKING=false
+# ENABLE_PREMIUM_LISTINGS=false
+# ENABLE_SUPPLIER_ANALYTICS=false
+# ENABLE_QUOTE_REQUESTS=true
+# ENABLE_REVIEWS_SYSTEM=true
+# ENABLE_AI_COMPARISON=true
+
+# -----------------------------------------------------------------------------
+# RATE LIMITING & SECURITY
+# -----------------------------------------------------------------------------
+# API rate limiting
+# RATE_LIMIT_MAX=100
+# RATE_LIMIT_WINDOW_MS=900000
+
+# CORS origins (comma-separated)
+# CORS_ORIGINS=http://localhost:3000,https://yourdomain.com
+
+# -----------------------------------------------------------------------------
+# THIRD-PARTY INTEGRATIONS
+# -----------------------------------------------------------------------------
+# Optional: Slack notifications for admin alerts
+# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/slack/webhook
+
+# Optional: Discord notifications
+# DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your/discord/webhook
+
+# Optional: Lead generation integrations
+# ZAPIER_WEBHOOK_URL=https://hooks.zapier.com/hooks/catch/your/zapier/hook
+
+# -----------------------------------------------------------------------------
+# CACHING & PERFORMANCE
+# -----------------------------------------------------------------------------
+# Redis for caching (optional)
+# REDIS_URL=redis://localhost:6379
+
+# CDN configuration
+# CDN_URL=https://cdn.yourdomain.com
+
+# -----------------------------------------------------------------------------
+# BACKUP & MAINTENANCE
+# -----------------------------------------------------------------------------
+# Database backup configuration
+# BACKUP_SCHEDULE="0 2 * * *"  # Daily at 2 AM
+# BACKUP_RETENTION_DAYS=30
+
+# Maintenance mode
+# MAINTENANCE_MODE=false
+# MAINTENANCE_MESSAGE="We're currently performing scheduled maintenance."
+
+# =============================================================================
+# DEPLOYMENT CHECKLIST
+# =============================================================================
+# Before deploying to production:
+# 
+# 1. Update NEXT_PUBLIC_SITE_URL to your actual domain
+# 2. Set NODE_ENV=production
+# 3. Generate secure random keys for any SECRET variables
+# 4. Configure your email service for notifications
+# 5. Set up analytics and monitoring
+# 6. Configure your payment processor (if using premium features)
+# 7. Set up automated backups
+# 8. Test all features with production environment variables
+# 9. Configure your domain and SSL certificate
+# 10. Set up monitoring and error tracking
+# =============================================================================
