@@ -16,7 +16,6 @@ import {
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarIconSolid } from '@heroicons/react/20/solid'
 import Link from 'next/link'
-import { Metadata } from 'next'
 import { compareSuppliers, getSupplierLogoUrl, cn, formatRating } from '@/lib/utils'
 import { NoComparisonItems, LoadingState, ErrorState } from '@/components/EmptyState'
 import { FeatureGate } from '@/components/providers/FeatureFlagProvider'
