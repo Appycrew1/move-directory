@@ -1,368 +1,438 @@
-// Database types
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 export interface Database {
   public: {
     Tables: {
-      categories: {
-        Row: Category
-        Insert: Omit<Category, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<Category, 'id' | 'created_at' | 'updated_at'>>
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          company_name: string | null
+          phone: string | null
+          role: 'user' | 'admin' | 'supplier'
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          company_name?: string | null
+          phone?: string | null
+          role?: 'user' | 'admin' | 'supplier'
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          company_name?: string | null
+          phone?: string | null
+          role?: 'user' | 'admin' | 'supplier'
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
       suppliers: {
-        Row: Supplier
-        Insert: Omit<Supplier, 'id' | 'created_at' | 'updated_at' | 'view_count' | 'contact_count' | 'rating_average' | 'rating_count'>
-        Update: Partial<Omit<Supplier, 'id' | 'created_at' | 'updated_at'>>
-      }
-      supplier_tags: {
-        Row: SupplierTag
-        Insert: Omit<SupplierTag, 'id' | 'created_at'>
-        Update: Partial<Omit<SupplierTag, 'id' | 'created_at'>>
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          website: string | null
+          phone: string | null
+          email: string | null
+          address: string | null
+          city: string | null
+          postcode: string | null
+          logo_url: string | null
+          categories: string[]
+          services: string[]
+          coverage_areas: string[]
+          minimum_order: number | null
+          established_year: number | null
+          staff_count: string | null
+          certifications: string[]
+          avg_rating: number | null
+          total_reviews: number
+          is_verified: boolean
+          is_featured: boolean
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          website?: string | null
+          phone?: string | null
+          email?: string | null
+          address?: string | null
+          city?: string | null
+          postcode?: string | null
+          logo_url?: string | null
+          categories?: string[]
+          services?: string[]
+          coverage_areas?: string[]
+          minimum_order?: number | null
+          established_year?: number | null
+          staff_count?: string | null
+          certifications?: string[]
+          avg_rating?: number | null
+          total_reviews?: number
+          is_verified?: boolean
+          is_featured?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          website?: string | null
+          phone?: string | null
+          email?: string | null
+          address?: string | null
+          city?: string | null
+          postcode?: string | null
+          logo_url?: string | null
+          categories?: string[]
+          services?: string[]
+          coverage_areas?: string[]
+          minimum_order?: number | null
+          established_year?: number | null
+          staff_count?: string | null
+          certifications?: string[]
+          avg_rating?: number | null
+          total_reviews?: number
+          is_verified?: boolean
+          is_featured?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
       }
       reviews: {
-        Row: Review
-        Insert: Omit<Review, 'id' | 'created_at' | 'updated_at' | 'helpful_count'>
-        Update: Partial<Omit<Review, 'id' | 'created_at' | 'updated_at'>>
+        Row: {
+          id: string
+          supplier_id: string
+          user_id: string
+          rating: number
+          title: string | null
+          comment: string | null
+          verified_purchase: boolean
+          helpful_count: number
+          is_approved: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          supplier_id: string
+          user_id: string
+          rating: number
+          title?: string | null
+          comment?: string | null
+          verified_purchase?: boolean
+          helpful_count?: number
+          is_approved?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          supplier_id?: string
+          user_id?: string
+          rating?: number
+          title?: string | null
+          comment?: string | null
+          verified_purchase?: boolean
+          helpful_count?: number
+          is_approved?: boolean
+          created_at?: string
+          updated_at?: string
+        }
       }
       quote_requests: {
-        Row: QuoteRequest
-        Insert: Omit<QuoteRequest, 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Omit<QuoteRequest, 'id' | 'created_at' | 'updated_at'>>
-      }
-      contact_messages: {
-        Row: ContactMessage
-        Insert: Omit<ContactMessage, 'id' | 'created_at' | 'read_at'>
-        Update: Partial<Omit<ContactMessage, 'id' | 'created_at'>>
+        Row: {
+          id: string
+          user_id: string
+          supplier_id: string
+          service_type: string
+          move_date: string | null
+          move_from: string
+          move_to: string
+          property_size: string
+          special_requirements: string | null
+          budget_range: string | null
+          contact_preference: 'email' | 'phone' | 'both'
+          status: 'pending' | 'contacted' | 'quoted' | 'accepted' | 'declined'
+          commission_rate: number | null
+          commission_amount: number | null
+          quote_value: number | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          supplier_id: string
+          service_type: string
+          move_date?: string | null
+          move_from: string
+          move_to: string
+          property_size: string
+          special_requirements?: string | null
+          budget_range?: string | null
+          contact_preference?: 'email' | 'phone' | 'both'
+          status?: 'pending' | 'contacted' | 'quoted' | 'accepted' | 'declined'
+          commission_rate?: number | null
+          commission_amount?: number | null
+          quote_value?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          supplier_id?: string
+          service_type?: string
+          move_date?: string | null
+          move_from?: string
+          move_to?: string
+          property_size?: string
+          special_requirements?: string | null
+          budget_range?: string | null
+          contact_preference?: 'email' | 'phone' | 'both'
+          status?: 'pending' | 'contacted' | 'quoted' | 'accepted' | 'declined'
+          commission_rate?: number | null
+          commission_amount?: number | null
+          quote_value?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
       }
       feature_flags: {
-        Row: FeatureFlag
-        Insert: Omit<FeatureFlag, 'created_at' | 'updated_at'>
-        Update: Partial<Omit<FeatureFlag, 'created_at' | 'updated_at'>>
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          is_active: boolean
+          phase: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          is_active?: boolean
+          phase?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          is_active?: boolean
+          phase?: number | null
+          created_at?: string
+          updated_at?: string
+        }
       }
-      user_profiles: {
-        Row: UserProfile
-        Insert: Omit<UserProfile, 'created_at' | 'updated_at'>
-        Update: Partial<Omit<UserProfile, 'created_at' | 'updated_at'>>
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          supplier_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          supplier_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          supplier_id?: string
+          created_at?: string
+        }
       }
-      saved_suppliers: {
-        Row: SavedSupplier
-        Insert: Omit<SavedSupplier, 'id' | 'created_at'>
-        Update: Partial<Omit<SavedSupplier, 'id' | 'created_at'>>
+      comparisons: {
+        Row: {
+          id: string
+          user_id: string
+          supplier_ids: string[]
+          ai_analysis: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          supplier_ids: string[]
+          ai_analysis?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          supplier_ids?: string[]
+          ai_analysis?: string | null
+          created_at?: string
+        }
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      user_role: 'user' | 'admin' | 'supplier'
+      quote_status: 'pending' | 'contacted' | 'quoted' | 'accepted' | 'declined'
+      contact_preference: 'email' | 'phone' | 'both'
     }
   }
 }
 
-// Core entities
-export interface Category {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  icon?: string
-  created_at: string
-  updated_at: string
-}
+// Utility types
+export type Supplier = Database['public']['Tables']['suppliers']['Row']
+export type SupplierInsert = Database['public']['Tables']['suppliers']['Insert']
+export type SupplierUpdate = Database['public']['Tables']['suppliers']['Update']
 
-export interface Supplier {
-  id: string
-  name: string
-  slug: string
-  category_id?: string
-  description?: string
-  short_summary?: string
-  logo_url?: string
-  website_url?: string
-  contact_email?: string
-  contact_phone?: string
-  
-  // Location & Service Area
-  location?: string
-  service_areas?: string[]
-  
-  // Business Info
-  founded_year?: number
-  employee_count?: string
-  annual_revenue_range?: string
-  
-  // Platform Status
-  status: 'pending' | 'approved' | 'rejected' | 'hidden'
-  featured: boolean
-  verified_business: boolean
-  verified_insurance: boolean
-  
-  // Pricing & Discounts
-  has_discount: boolean
-  discount_description?: string
-  discount_code?: string
-  pricing_model?: string
-  
-  // Engagement Metrics
-  view_count: number
-  contact_count: number
-  rating_average: number
-  rating_count: number
-  
-  // Feature Flags
-  accepts_quotes: boolean
-  commission_rate: number
-  
-  // Metadata
-  created_at: string
-  updated_at: string
-  created_by?: string
-  approved_by?: string
-  approved_at?: string
-  
-  // Relations
-  category?: Category
-  tags?: SupplierTag[]
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+
+export type Review = Database['public']['Tables']['reviews']['Row']
+export type ReviewInsert = Database['public']['Tables']['reviews']['Insert']
+export type ReviewUpdate = Database['public']['Tables']['reviews']['Update']
+
+export type QuoteRequest = Database['public']['Tables']['quote_requests']['Row']
+export type QuoteRequestInsert = Database['public']['Tables']['quote_requests']['Insert']
+export type QuoteRequestUpdate = Database['public']['Tables']['quote_requests']['Update']
+
+export type FeatureFlag = Database['public']['Tables']['feature_flags']['Row']
+export type FeatureFlagInsert = Database['public']['Tables']['feature_flags']['Insert']
+export type FeatureFlagUpdate = Database['public']['Tables']['feature_flags']['Update']
+
+export type Favorite = Database['public']['Tables']['favorites']['Row']
+export type Comparison = Database['public']['Tables']['comparisons']['Row']
+
+// Extended types with relations
+export type SupplierWithStats = Supplier & {
   reviews?: Review[]
+  quote_requests?: QuoteRequest[]
+  is_favorited?: boolean
 }
 
-export interface SupplierTag {
-  id: string
-  supplier_id: string
-  tag: string
-  created_at: string
+export type ReviewWithUser = Review & {
+  profiles: Pick<Profile, 'full_name' | 'avatar_url'>
 }
 
-export interface Review {
-  id: string
-  supplier_id: string
-  user_id: string
-  company_name?: string
-  rating: number
-  title?: string
-  content: string
-  verified: boolean
-  helpful_count: number
-  created_at: string
-  updated_at: string
-  
-  // Relations
-  user_profile?: UserProfile
+export type QuoteRequestWithDetails = QuoteRequest & {
+  supplier: Pick<Supplier, 'name' | 'logo_url' | 'email' | 'phone'>
+  user: Pick<Profile, 'full_name' | 'email' | 'phone'>
 }
 
-export interface QuoteRequest {
-  id: string
-  supplier_id: string
-  requester_email: string
-  requester_name: string
-  company_name?: string
-  phone?: string
-  
-  // Request Details
-  service_type?: string
-  budget_range?: string
-  timeline?: string
-  location?: string
-  message: string
-  
-  // Tracking
-  status: 'new' | 'responded' | 'converted' | 'lost'
-  source: string
-  utm_campaign?: string
-  utm_source?: string
-  
-  // Commission Tracking (Phase 2)
-  commission_tracked: boolean
-  commission_amount?: number
-  conversion_value?: number
-  converted_at?: string
-  
-  created_at: string
-  updated_at: string
-  
-  // Relations
-  supplier?: Supplier
-}
-
-export interface ContactMessage {
-  id: string
-  supplier_id?: string
-  name: string
-  email: string
-  company?: string
-  phone?: string
-  subject?: string
-  message: string
-  
-  status: 'new' | 'read' | 'responded'
-  source: string
-  
-  created_at: string
-  read_at?: string
-  
-  // Relations
-  supplier?: Supplier
-}
-
-export interface FeatureFlag {
-  id: string
-  enabled: boolean
-  description?: string
-  config: Record<string, any>
-  created_at: string
-  updated_at: string
-}
-
-export interface UserProfile {
-  id: string
-  email: string
-  full_name?: string
-  company_name?: string
-  phone?: string
-  location?: string
-  role: 'user' | 'admin' | 'supplier'
-  
-  // Preferences
-  email_notifications: boolean
-  marketing_emails: boolean
-  
-  created_at: string
-  updated_at: string
-}
-
-export interface SavedSupplier {
-  id: string
-  user_id: string
-  supplier_id: string
-  created_at: string
-  
-  // Relations
-  supplier?: Supplier
-}
-
-// UI Types
-export interface CompareSupplier extends Supplier {
-  isSelected: boolean
-}
-
-export interface AIComparison {
-  suppliers: {
-    id: string
-    name: string
-    pros: string[]
-    cons: string[]
-    bestFor: string
-  }[]
-  recommendation: string
-  generated_at: string
-}
-
-// Form Types
-export interface QuoteFormData {
-  requester_name: string
-  requester_email: string
-  company_name?: string
-  phone?: string
-  service_type?: string
-  budget_range?: string
-  timeline?: string
-  location?: string
-  message: string
-}
-
-export interface ContactFormData {
-  name: string
-  email: string
-  company?: string
-  phone?: string
-  subject?: string
-  message: string
-  supplier_id?: string
-}
-
-export interface SupplierFormData {
-  name: string
-  category_id: string
-  description: string
-  short_summary: string
-  website_url: string
-  contact_email: string
-  contact_phone?: string
-  location?: string
-  service_areas?: string[]
-  founded_year?: number
-  employee_count?: string
-  pricing_model?: string
-  has_discount: boolean
-  discount_description?: string
-  discount_code?: string
-  accepts_quotes: boolean
-  tags: string[]
-}
-
-export interface ReviewFormData {
-  rating: number
-  title?: string
-  content: string
-  company_name?: string
-}
-
-// Filter & Search Types
+// Search and filter types
 export interface SupplierFilters {
-  category?: string
-  location?: string
-  rating?: number
-  hasDiscount?: boolean
-  featured?: boolean
-  tags?: string[]
+  categories?: string[]
+  services?: string[]
+  coverage_areas?: string[]
+  min_rating?: number
+  is_verified?: boolean
+  min_established_year?: number
   search?: string
-  sortBy?: 'name' | 'rating' | 'newest' | 'popular'
-  sortOrder?: 'asc' | 'desc'
+  sort_by?: 'name' | 'rating' | 'reviews' | 'established'
+  sort_order?: 'asc' | 'desc'
 }
 
-export interface PaginationInfo {
+export interface SearchResults {
+  suppliers: SupplierWithStats[]
+  total: number
   page: number
   limit: number
-  total: number
-  totalPages: number
-  hasNext: boolean
-  hasPrev: boolean
+  filters: SupplierFilters
 }
 
-// API Response Types
+// AI Comparison types
+export interface AIComparisonResult {
+  summary: string
+  strengths: Record<string, string[]>
+  weaknesses: Record<string, string[]>
+  recommendations: string[]
+  best_for: Record<string, string>
+}
+
+// API Response types
 export interface ApiResponse<T = any> {
-  data: T
+  data?: T
+  error?: string
   message?: string
   success: boolean
 }
 
-export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
-  pagination: PaginationInfo
+// Form types
+export interface ContactForm {
+  name: string
+  email: string
+  company?: string
+  phone?: string
+  message: string
 }
 
-// Feature Flag Helpers
-export type FeatureFlagId = 
-  | 'commission_tracking'
-  | 'premium_listings' 
-  | 'supplier_analytics'
-  | 'quote_requests'
-  | 'reviews_system'
-  | 'ai_comparison'
-  | 'location_filtering'
-  | 'email_notifications'
-
-// Utility Types
-export type SupplierStatus = Supplier['status']
-export type UserRole = UserProfile['role']
-export type QuoteStatus = QuoteRequest['status']
-export type MessageStatus = ContactMessage['status']
-
-// Component Props
-export interface SupplierCardProps {
-  supplier: Supplier
-  showActions?: boolean
-  compact?: boolean
+export interface SupplierApplicationForm {
+  name: string
+  description: string
+  website?: string
+  email: string
+  phone: string
+  address: string
+  city: string
+  postcode: string
+  categories: string[]
+  services: string[]
+  coverage_areas: string[]
+  established_year?: number
+  staff_count?: string
+  certifications?: string[]
+  terms_accepted: boolean
 }
 
-export interface FeatureGateProps {
-  flag: FeatureFlagId
-  children: React.ReactNode
-  fallback?: React.ReactNode
+// Dashboard types
+export interface DashboardStats {
+  total_suppliers: number
+  total_reviews: number
+  total_quote_requests: number
+  pending_quotes: number
+  commission_earned: number
+  conversion_rate: number
 }
 
-export interface AdminOnlyProps {
-  children: React.ReactNode
-  fallback?: React.ReactNode
+export interface AdminDashboardData {
+  stats: DashboardStats
+  recent_suppliers: Supplier[]
+  recent_reviews: ReviewWithUser[]
+  recent_quotes: QuoteRequestWithDetails[]
+  feature_flags: FeatureFlag[]
 }
