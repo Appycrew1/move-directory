@@ -1,354 +1,265 @@
-import { clsx, type ClassValue } from 'clsx'
-import type { FeatureFlagId, Supplier, SupplierFilters } from './types'
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 // Tailwind CSS class merger
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs)
+  return twMerge(clsx(inputs))
 }
 
-// Feature flag utilities
-let cachedFeatureFlags: Record<string, boolean> = {}
-
-export async function isFeatureEnabled(flagId: FeatureFlagId): Promise<boolean> {
-  // Check cache first
-  if (flagId in cachedFeatureFlags) {
-    return cachedFeatureFlags[flagId]
-  }
-
-  try {
-    const response = await fetch(`/api/feature-flags/${flagId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    
-    if (!response.ok) {
-      console.warn(`Failed to fetch feature flag: ${flagId}`)
-      return false
-    }
-    
-    const data = await response.json()
-    const enabled = data.enabled || false
-    
-    // Cache the result
-    cachedFeatureFlags[flagId] = enabled
-    return enabled
-  } catch (error) {
-    console.error(`Error checking feature flag ${flagId}:`, error)
-    return false
-  }
-}
-
-// Clear feature flag cache (useful when toggling flags in admin)
-export function clearFeatureFlagCache() {
-  cachedFeatureFlags = {}
-}
-
-// Local storage utilities (for favorites, compare, etc.)
-export const localStorage = {
-  get: (key: string) => {
-    if (typeof window === 'undefined') return null
-    try {
-      const item = window.localStorage.getItem(key)
-      return item ? JSON.parse(item) : null
-    } catch (error) {
-      console.error(`Error getting localStorage key "${key}":`, error)
-      return null
-    }
-  },
-
-  set: (key: string, value: any) => {
-    if (typeof window === 'undefined') return
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value))
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error)
-    }
-  },
-
-  remove: (key: string) => {
-    if (typeof window === 'undefined') return
-    try {
-      window.localStorage.removeItem(key)
-    } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error)
-    }
-  }
-}
-
-// Favorites management
-export const favorites = {
-  get: (): string[] => localStorage.get('favorites') || [],
-  
-  add: (supplierId: string) => {
-    const current = favorites.get()
-    if (!current.includes(supplierId)) {
-      localStorage.set('favorites', [...current, supplierId])
-    }
-  },
-  
-  remove: (supplierId: string) => {
-    const current = favorites.get()
-    localStorage.set('favorites', current.filter(id => id !== supplierId))
-  },
-  
-  toggle: (supplierId: string) => {
-    const current = favorites.get()
-    if (current.includes(supplierId)) {
-      favorites.remove(supplierId)
-      return false
-    } else {
-      favorites.add(supplierId)
-      return true
-    }
-  },
-  
-  has: (supplierId: string): boolean => {
-    return favorites.get().includes(supplierId)
-  },
-  
-  clear: () => localStorage.remove('favorites')
-}
-
-// Compare suppliers management
-export const compareSuppliers = {
-  get: (): string[] => localStorage.get('compare') || [],
-  
-  add: (supplierId: string): boolean => {
-    const current = compareSuppliers.get()
-    if (current.length >= 3) return false // Max 3 suppliers
-    if (!current.includes(supplierId)) {
-      localStorage.set('compare', [...current, supplierId])
-      return true
-    }
-    return false
-  },
-  
-  remove: (supplierId: string) => {
-    const current = compareSuppliers.get()
-    localStorage.set('compare', current.filter(id => id !== supplierId))
-  },
-  
-  toggle: (supplierId: string): boolean => {
-    const current = compareSuppliers.get()
-    if (current.includes(supplierId)) {
-      compareSuppliers.remove(supplierId)
-      return false
-    } else {
-      return compareSuppliers.add(supplierId)
-    }
-  },
-  
-  has: (supplierId: string): boolean => {
-    return compareSuppliers.get().includes(supplierId)
-  },
-  
-  clear: () => localStorage.remove('compare'),
-  
-  canAdd: (): boolean => compareSuppliers.get().length < 3
-}
-
-// URL and slug utilities
-export function createSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9 -]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single
-    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-}
-
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text
-  return text.substring(0, maxLength).replace(/\s+\S*$/, '') + '...'
-}
-
-// Date formatting
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('en-GB', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(date)
-}
-
-export function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-  if (diffInSeconds < 60) return 'Just now'
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`
-  
-  return formatDate(dateString)
-}
-
-// Number formatting
-export function formatRating(rating: number): string {
-  return rating.toFixed(1)
-}
-
-export function formatPrice(price: number, currency = 'GBP'): string {
+// Format currency
+export function formatCurrency(amount: number, currency: string = 'GBP'): string {
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }).format(price)
+    maximumFractionDigits: 2,
+  }).format(amount)
 }
 
-// Search and filter utilities
-export function buildSupplierQuery(filters: SupplierFilters) {
-  const params = new URLSearchParams()
+// Format date
+export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }
   
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      if (Array.isArray(value)) {
-        value.forEach(v => params.append(key, v))
-      } else {
-        params.append(key, value.toString())
-      }
-    }
-  })
-  
-  return params.toString()
+  return new Intl.DateTimeFormat('en-GB', { ...defaultOptions, ...options }).format(
+    typeof date === 'string' ? new Date(date) : date
+  )
 }
 
-export function parseSupplierFilters(searchParams: URLSearchParams): SupplierFilters {
-  return {
-    search: searchParams.get('search') || undefined,
-    category: searchParams.get('category') || undefined,
-    location: searchParams.get('location') || undefined,
-    rating: searchParams.get('rating') ? parseInt(searchParams.get('rating')!) : undefined,
-    hasDiscount: searchParams.get('hasDiscount') === 'true',
-    featured: searchParams.get('featured') === 'true',
-    tags: searchParams.getAll('tags'),
-    sortBy: (searchParams.get('sortBy') as any) || 'name',
-    sortOrder: (searchParams.get('sortOrder') as any) || 'asc'
+// Format relative time (e.g., "2 days ago")
+export function formatRelativeTime(date: string | Date): string {
+  const now = new Date()
+  const targetDate = typeof date === 'string' ? new Date(date) : date
+  const diffInSeconds = Math.floor((now.getTime() - targetDate.getTime()) / 1000)
+
+  if (diffInSeconds < 60) {
+    return 'just now'
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60)
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600)
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`
+  } else if (diffInSeconds < 2592000) {
+    const days = Math.floor(diffInSeconds / 86400)
+    return `${days} day${days > 1 ? 's' : ''} ago`
+  } else if (diffInSeconds < 31536000) {
+    const months = Math.floor(diffInSeconds / 2592000)
+    return `${months} month${months > 1 ? 's' : ''} ago`
+  } else {
+    const years = Math.floor(diffInSeconds / 31536000)
+    return `${years} year${years > 1 ? 's' : ''} ago`
   }
 }
 
-// Validation utilities
+// Generate slug from string
+export function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+// Truncate text
+export function truncate(text: string, length: number = 100): string {
+  if (text.length <= length) return text
+  return text.slice(0, length).trim() + '...'
+}
+
+// Calculate average rating
+export function calculateAverageRating(ratings: number[]): number {
+  if (ratings.length === 0) return 0
+  const sum = ratings.reduce((acc, rating) => acc + rating, 0)
+  return Math.round((sum / ratings.length) * 10) / 10
+}
+
+// Generate star rating display
+export function generateStarRating(rating: number): { filled: number; half: boolean; empty: number } {
+  const filled = Math.floor(rating)
+  const half = rating % 1 >= 0.5
+  const empty = 5 - filled - (half ? 1 : 0)
+  
+  return { filled, half, empty }
+}
+
+// Validate email
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
 
-export function isValidPhone(phone: string): boolean {
-  const phoneRegex = /^[\d\s\-\+\(\)]+$/
-  return phoneRegex.test(phone.trim())
+// Validate UK postcode
+export function isValidUKPostcode(postcode: string): boolean {
+  const postcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i
+  return postcodeRegex.test(postcode.replace(/\s/g, ''))
 }
 
-export function isValidUrl(url: string): boolean {
+// Format UK postcode
+export function formatUKPostcode(postcode: string): string {
+  const cleaned = postcode.replace(/\s/g, '').toUpperCase()
+  if (cleaned.length === 6) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`
+  } else if (cleaned.length === 7) {
+    return `${cleaned.slice(0, 4)} ${cleaned.slice(4)}`
+  }
+  return postcode
+}
+
+// Validate UK phone number
+export function isValidUKPhone(phone: string): boolean {
+  const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/
+  return phoneRegex.test(phone.replace(/\s/g, ''))
+}
+
+// Format UK phone number
+export function formatUKPhone(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '')
+  if (cleaned.startsWith('44')) {
+    const number = cleaned.slice(2)
+    return `+44 ${number.slice(0, 4)} ${number.slice(4, 7)} ${number.slice(7)}`
+  } else if (cleaned.startsWith('07')) {
+    return `${cleaned.slice(0, 5)} ${cleaned.slice(5, 8)} ${cleaned.slice(8)}`
+  }
+  return phone
+}
+
+// Generate random ID
+export function generateId(length: number = 8): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
+// Debounce function
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => func(...args), delay)
+  }
+}
+
+// Calculate distance between two postcodes (simplified)
+export function calculateDistance(postcode1: string, postcode2: string): number {
+  // This is a simplified implementation
+  // In production, you'd use a proper geocoding service
+  const area1 = postcode1.slice(0, 2).toUpperCase()
+  const area2 = postcode2.slice(0, 2).toUpperCase()
+  
+  if (area1 === area2) return Math.random() * 10 // 0-10 miles
+  
+  // London postcodes
+  const londonAreas = ['E1', 'EC', 'N1', 'NW', 'SE', 'SW', 'W1', 'WC']
+  if (londonAreas.includes(area1) && londonAreas.includes(area2)) {
+    return Math.random() * 25 // 0-25 miles within London
+  }
+  
+  return Math.random() * 200 + 10 // 10-210 miles for different areas
+}
+
+// Convert array to comma-separated string
+export function arrayToString(arr: string[], conjunction: string = 'and'): string {
+  if (arr.length === 0) return ''
+  if (arr.length === 1) return arr[0]
+  if (arr.length === 2) return `${arr[0]} ${conjunction} ${arr[1]}`
+  
+  const lastItem = arr[arr.length - 1]
+  const otherItems = arr.slice(0, -1).join(', ')
+  return `${otherItems}, ${conjunction} ${lastItem}`
+}
+
+// Extract initials from name
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
+}
+
+// Convert file size to human readable format
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// Sleep function for delays
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// Capitalize first letter
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+// Convert camelCase to Title Case
+export function camelToTitle(str: string): string {
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim()
+}
+
+// Check if string is empty or whitespace
+export function isEmpty(str: string | null | undefined): boolean {
+  return !str || str.trim().length === 0
+}
+
+// Remove duplicates from array
+export function removeDuplicates<T>(arr: T[]): T[] {
+  return [...new Set(arr)]
+}
+
+// Sort array of objects by property
+export function sortBy<T>(arr: T[], key: keyof T, order: 'asc' | 'desc' = 'asc'): T[] {
+  return [...arr].sort((a, b) => {
+    const aVal = a[key]
+    const bVal = b[key]
+    
+    if (aVal < bVal) return order === 'asc' ? -1 : 1
+    if (aVal > bVal) return order === 'asc' ? 1 : -1
+    return 0
+  })
+}
+
+// Group array by property
+export function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> {
+  return arr.reduce((groups, item) => {
+    const group = String(item[key])
+    groups[group] = groups[group] || []
+    groups[group].push(item)
+    return groups
+  }, {} as Record<string, T[]>)
+}
+
+// Safe JSON parse
+export function safeJsonParse<T>(json: string, fallback: T): T {
   try {
-    new URL(url)
-    return true
+    return JSON.parse(json)
   } catch {
-    return false
+    return fallback
   }
 }
 
-// Error handling
-export class AppError extends Error {
-  constructor(
-    message: string,
-    public statusCode: number = 500,
-    public code?: string
-  ) {
-    super(message)
-    this.name = 'AppError'
-  }
-}
-
-export function handleApiError(error: any) {
-  console.error('API Error:', error)
-  
-  if (error instanceof AppError) {
-    return {
-      error: error.message,
-      statusCode: error.statusCode,
-      code: error.code
-    }
-  }
-  
-  if (error.code === 'PGRST116') {
-    return {
-      error: 'Record not found',
-      statusCode: 404,
-      code: 'NOT_FOUND'
-    }
-  }
-  
-  if (error.code === '23505') {
-    return {
-      error: 'This record already exists',
-      statusCode: 409,
-      code: 'DUPLICATE'
-    }
-  }
-  
-  return {
-    error: 'An unexpected error occurred',
-    statusCode: 500,
-    code: 'INTERNAL_ERROR'
-  }
-}
-
-// Analytics and tracking
-export function trackEvent(eventName: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, properties)
-  }
-  
-  // Add other analytics providers here (Mixpanel, Amplitude, etc.)
-  console.log(`Event: ${eventName}`, properties)
-}
-
-// SEO utilities
-export function generateMetaTitle(title: string, siteName = 'Moving Suppliers Hub'): string {
-  return `${title} | ${siteName}`
-}
-
-export function generateMetaDescription(description: string, maxLength = 160): string {
-  return truncateText(description, maxLength)
-}
-
-// Supplier utilities
-export function getSupplierUrl(supplier: { slug: string }): string {
-  return `/suppliers/${supplier.slug}`
-}
-
-export function getSupplierLogoUrl(logoUrl?: string): string {
-  if (logoUrl) return logoUrl
-  return '/images/default-logo.png' // Fallback logo
-}
-
-export function calculateSupplierScore(supplier: Supplier): number {
-  let score = 0
-  
-  // Base score from rating
-  score += supplier.rating_average * 20 // Max 100 from rating
-  
-  // Bonuses
-  if (supplier.verified_business) score += 10
-  if (supplier.verified_insurance) score += 10
-  if (supplier.description && supplier.description.length > 100) score += 5
-  if (supplier.logo_url) score += 5
-  if (supplier.review_count && supplier.review_count > 5) score += 10
-  
-  return Math.min(score, 100) // Cap at 100
-}
-
-// Export commonly used constants
-export const ITEMS_PER_PAGE = 12
-export const MAX_COMPARE_ITEMS = 3
-export const MAX_UPLOAD_SIZE = 5 * 1024 * 1024 // 5MB
-export const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
-// Type guards
-export function isSupplier(obj: any): obj is Supplier {
-  return obj && typeof obj === 'object' && 'id' in obj && 'name' in obj && 'status' in obj
+// Generate avatar URL from initials
+export function generateAvatarUrl(name: string): string {
+  const initials = getInitials(name)
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=0ea5e9&color=white&size=128`
 }
